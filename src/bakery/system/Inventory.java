@@ -57,55 +57,195 @@ public class Inventory {
         } while (!choice.equals("5")); 
     }
     
-    public void addProduct() {
-       
-        System.out.print("Enter Product (Bread): ");
-        String pname = sc.nextLine();
-       int pqty = 0; // Initialize quantity
-        boolean validInput = false; // Flag to track valid quantity input
-        
-        // Loop until valid quantity is entered
-        while (!validInput) {
-            System.out.print("Enter Quantity: ");
-            try {
-                pqty = sc.nextInt(); // Try to read an integer quantity
-                validInput = true; // Set flag to true if input is valid
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input...Please try Again!!!.");
-                sc.nextLine(); // Clear the invalid input from the scanner
-            }
-        }
-        
-        // Reset the validInput flag for the next validation
-        validInput = false;
-        float pprice = 0.0f; // Initialize selling price
-        
-        // Loop until valid selling price is entered
-        while (!validInput) {
-            System.out.print("Enter Selling Price: ");
-            try {
-                pprice = sc.nextFloat(); // Try to read a float selling price
-                validInput = true; // Set flag to true if input is valid
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input...Please enter a valid price.");
-                sc.nextLine(); // Clear the invalid input from the scanner
-            }
-        }
-        String pstatus = (pqty > 1) ? "Available" : "Out of Stock";
-        String sql = "INSERT INTO tbl_product (p_name, p_qty, p_price, p_status) VALUES (?, ?, ?, ?)";
+   public void addProduct() {
+    System.out.print("Enter Product (Bread): ");
+    String pname = sc.nextLine(); // Prompt for product name
 
-        conf.addRecord(sql, pname, pqty, pprice, pstatus);
+    int pqty = 0; // Initialize quantity
+    boolean validInput = false; // Flag to track valid quantity input
+
+    // Loop until valid quantity is entered
+    while (!validInput) {
+        System.out.print("Enter Quantity: ");
+        try {
+            pqty = sc.nextInt(); // Try to read an integer quantity
+            sc.nextLine(); // Clear the buffer to avoid issues with nextLine later
+            validInput = true; // Set flag to true if input is valid
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input...Please try again!");
+            sc.nextLine(); // Clear the invalid input from the scanner
+        }
     }
+
+    // Reset the validInput flag for the next validation
+    validInput = false;
+    float pprice = 0.0f; // Initialize selling price
+
+    // Loop until valid selling price is entered
+    while (!validInput) {
+        System.out.print("Enter Selling Price: ");
+        try {
+            pprice = sc.nextFloat(); // Try to read a float selling price
+            sc.nextLine(); // Clear the buffer to avoid issues with nextLine later
+            validInput = true; // Set flag to true if input is valid
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input...Please enter a valid price.");
+            sc.nextLine(); // Clear the invalid input from the scanner
+        }
+    }
+
+    String pstatus = (pqty > 1) ? "In Stock" : "Sold Out";
+    String sql = "INSERT INTO tbl_product (p_name, p_qty, p_price, p_status) VALUES (?, ?, ?, ?)";
+
+    conf.addRecord(sql, pname, pqty, pprice, pstatus);
+    System.out.println("Product added successfully!");
+}
 
     public void viewInventory() {
         
         System.out.println("-------------------------------------------------------------------------------------------");
         System.out.println("|                                     INVENTORY                                           |");
-        String sqlQuery = "SELECT p_id, p_name, p_qty, p_price, p_status FROM tbl_product"; 
-        String[] columnHeaders = {"Product ID", "Product Name", "Quantity", "Price", "Status"}; 
+        
+        String sqlQuery = "SELECT p_id, p_name, p_qty, p_price, p_status FROM tbl_product";
+        String[] columnHeaders = {"Product ID", "Product Name", "Quantity", "Price", "Status"};
         String[] columnNames = {"p_id", "p_name", "p_qty", "p_price", "p_status"};
 
-        conf.viewRecords(sqlQuery, columnHeaders, columnNames);    
+        conf.viewRecords(sqlQuery, columnHeaders, columnNames);
+
+        System.out.println("\nOptions for Specific Report:");
+        System.out.println("1. View product by ID");
+        System.out.println("2. View products by stock status (In Stock / Out of Stock)");
+        System.out.println("3. Cancel");
+        
+        System.out.print("\nEnter your choice : ");
+        
+        int choice = sc.nextInt();
+        sc.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Product ID to view details: ");
+                    String pid = sc.nextLine();
+                    viewProductByProductID();
+                    break;
+                case 2:
+                    System.out.print("Enter stock status to filter by (1 for In Stock / 2 Sold Out): ");
+                    int statusChoice = sc.nextInt();
+                    sc.nextLine(); 
+                    
+                    String status = (statusChoice == 1) ? "In Stock" : "Sold Out";
+                    viewProductsByStatus(status);
+                    break;
+                case 3:
+                    System.out.println("Canceling...");
+                    break; 
+                default:
+                    System.out.println("Invalid choice. Please select 1 or 2.");
+            }
+    }
+    public void viewProductByProductID() {
+        System.out.print("Enter Product ID to view sales history: ");
+        String pid = sc.nextLine();
+
+        try {
+            // Retrieve product details from tbl_product
+            PreparedStatement productSearch = conf.connectDB().prepareStatement("SELECT * FROM tbl_product WHERE p_id = ?");
+            productSearch.setString(1, pid);
+            ResultSet productResult = productSearch.executeQuery();
+
+            if (!productResult.next()) {
+                System.out.println("Product with ID " + pid + " does not exist.");
+                productResult.close();
+                productSearch.close();
+                return;
+            }
+
+            String pname = productResult.getString("p_name");
+            double price = productResult.getDouble("p_price");
+            System.out.println("\nProduct Details:");
+            System.out.println("Product ID: " + pid);
+            System.out.println("Product Name: " + pname);
+            System.out.println("Price: " + price);
+
+            productResult.close();
+            productSearch.close();
+
+            // Query sales data for the specified product from tbl_sales
+            String sqlQuery = "SELECT s_date, qty_sold FROM tbl_sales WHERE p_id = ?";
+            PreparedStatement salesSearch = conf.connectDB().prepareStatement(sqlQuery);
+            salesSearch.setString(1, pid);
+            ResultSet salesResult = salesSearch.executeQuery();
+
+            int totalQtySold = 0;
+            boolean hasSales = false;
+
+            System.out.println("\nSales History:");
+            System.out.println("Date of Sale          | Quantity Sold");
+            System.out.println("----------------------+--------------\n");
+
+            while (salesResult.next()) {
+                hasSales = true;
+                String saleDate = salesResult.getString("s_date");
+                int qtySold = salesResult.getInt("qty_sold");
+
+                System.out.printf("%-20s | %d\n", saleDate, qtySold);
+                totalQtySold += qtySold;
+            }
+
+            if (!hasSales) {
+                System.out.println("No sales record found for this product.");
+            } else {
+                System.out.println("\nTotal Quantity Sold: " + totalQtySold);
+            }
+
+            salesResult.close();
+            salesSearch.close();
+
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    
+    private void viewProductsByStatus(String status) {
+    String sql = "SELECT p_id, p_name, p_qty, p_price, p_status FROM tbl_product WHERE p_status = ?";
+
+        try (PreparedStatement search = conf.connectDB().prepareStatement(sql)) {
+            search.setString(1, status);
+            ResultSet result = search.executeQuery();
+            
+            System.out.println("--------------------------------");
+            System.out.println("\nProducts with status \"" + status + "\":");
+            System.out.println("-----------------------------------------------------------------");
+            System.out.printf("| %-13s | %-13s | %-13s | %-13s |\n",
+                        "Product ID", "Product Name","Quantity","Price");
+            System.out.println("-----------------------------------------------------------------");
+            
+            boolean hasResults = false;
+            int num_p = 0;
+
+            while (result.next()) {
+                hasResults = true;
+                int id = result.getInt("p_id");
+                String pname = result.getString("p_name");
+                int qty = result.getInt("p_qty");
+                double price = result.getDouble("p_price");
+                
+                System.out.printf("| %-13d | %-13s | %-13d | %-13.2f |\n",
+                         id, pname, qty, price);
+                num_p++;
+
+            }
+            System.out.println("-----------------------------------------------------------------");
+            System.out.println("Number of Products " + status + " : " +  num_p);
+            System.out.println("");
+
+            if (!hasResults) {
+                System.out.println("No products found with status \"" + status + "\".");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
     
     public void updateProduct() {
@@ -136,7 +276,7 @@ public class Inventory {
         System.out.print("Enter new Selling Price: ");
         float newPrice = sc.nextFloat();
 
-        String newStatus = (newQty > 0) ? "Available" : "Out of Stock";
+        String newStatus = (newQty > 0) ? "In Stock" : "Sold out";
         String sqlUpdate = "UPDATE tbl_product SET p_name = ?, p_qty = ?, p_price = ?, p_status = ? WHERE p_id = ?";
         
         conf.updateRecord(sqlUpdate, newName, newQty, newPrice, newStatus, productId);  

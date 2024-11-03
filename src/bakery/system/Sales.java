@@ -61,6 +61,7 @@ public class Sales {
         } while (!choice.equals("5"));
     }
     private void addSales(){
+        
         System.out.print("Enter product ID: ");
         int pid = sc.nextInt();
         
@@ -70,6 +71,12 @@ public class Sales {
             search.setInt(1, pid);
             ResultSet result = search.executeQuery();
             
+            if (!result.next()) {
+                System.out.println("Product with ID " + pid + " does not exist.");
+                return;
+            }
+                
+            int id = result.getInt("p_id");
             String pname = result.getString("p_name");
             double price = result.getDouble("p_price");
             int inventoryQTY = result.getInt("p_qty");
@@ -83,8 +90,8 @@ public class Sales {
             
             double revenue = qty * result.getDouble("p_price");
             
-            sql = "INSERT INTO tbl_sales (p_name, qty_sold, s_date, s_price, t_revenue) VALUES (?, ?, ?, ?, ?)";
-            conf.addRecord(sql, pname, qty, currDate.toString(), price, revenue);
+            sql = "INSERT INTO tbl_sales (p_name, p_id, qty_sold, s_date, s_price, t_revenue) VALUES (?, ?, ?, ?, ?, ?)";
+            conf.addRecord(sql, pname, id, qty, currDate.toString(), price, revenue);
             
             // Update inventory quantity
             int updatedQTY = inventoryQTY-qty;
@@ -94,21 +101,20 @@ public class Sales {
                 conf.updateRecord(deductQTY, updatedQTY, pid);
             } else if(updatedQTY == 0){
                 String deductQTY = "UPDATE tbl_product SET p_qty = ?, p_status = ? WHERE p_id = ?";
-                conf.updateRecord(deductQTY, updatedQTY,"Out of Stock", pid);
+                conf.updateRecord(deductQTY, updatedQTY,"Sold Out", pid);
             }
             result.close();
         } catch(SQLException e){
             System.out.println("Error: "+e.getMessage());
         }
     }
-    
     private void viewSales(){
         System.out.println("-------------------------------------------------------------------------------------------------------------");
         System.out.println("|                                                 SALES                                                     |");
         
-        String sqlQuery = "SELECT sale_id, p_name, qty_sold, s_date, s_price, t_revenue FROM tbl_sales";
-        String[] columnHeaders = {"ID", "Product Name", "Quantity Sold", "Sale Date", "Price", "Revenue"};
-        String[] columnNames = {"sale_id", "p_name", "qty_sold", "s_date", "s_price", "t_revenue"};
+        String sqlQuery = "SELECT sale_id, p_id, p_name, qty_sold, s_date, s_price, t_revenue FROM tbl_sales";
+        String[] columnHeaders = {"ID" ,"Product ID" ,"Product Name", "Quantity Sold", "Sale Date", "Price", "Revenue"};
+        String[] columnNames = {"sale_id","p_id" , "p_name", "qty_sold", "s_date", "s_price", "t_revenue"};
         
         conf.viewRecords(sqlQuery, columnHeaders, columnNames);
         
@@ -131,27 +137,42 @@ public class Sales {
     }
     
     private void updateSales(){
+       
         System.out.print("Enter Sales ID to update: ");
         int salesId = sc.nextInt();
         sc.nextLine(); 
         
-        // Check if the Product Id Exist
-        try{
-            PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_sales WHERE sale_id = ?");
-            
+        try (PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_sales WHERE sale_id = ?")) {
             search.setInt(1, salesId);
             ResultSet result = search.executeQuery();
             
-                if (!result.next() ) {
-                System.out.println("Product with ID " + salesId + " does not exist. Please try again.");
-                return; 
+            if (!result.next()) {
+                System.out.println("Sale with ID " + salesId + " does not exist.");
+                return;
             }
             
-        } catch(SQLException e){
+            String currentProduct = result.getString("p_name");
+            int currentQty = result.getInt("qty_sold");
+            double currentPrice = result.getDouble("s_price");
+            double currentRevenue = result.getDouble("t_revenue");
             
+            System.out.println("Current Sale Record: " + currentProduct + ", Quantity Sold: " + currentQty + ", Price: " + currentPrice);
+            
+            System.out.print("Enter new quantity sold: ");
+            int newQty = sc.nextInt();
+            double newRevenue = newQty * currentPrice;
+            
+            sql = "UPDATE tbl_sales SET qty_sold = ?, t_revenue = ? WHERE sale_id = ?";
+            conf.updateRecord(sql, newQty, newRevenue, salesId);
+            
+            result.close();
+          
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
-    public void deleteProduct(){
+    
+    private void deleteProduct(){
         Scanner s = new Scanner(System.in);
 
         System.out.print("Enter ID to Delete: ");
