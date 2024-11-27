@@ -68,9 +68,9 @@ public class Inventory {
     }
     
     public void addProduct() {
-        System.out.println("      Enter Product Details       ");
-        System.out.print("--------------------------------\n");
-        System.out.print("\nEnter Product (Bread): ");
+        System.out.println("                   Enter Product Details                    ");
+        System.out.println("------------------------------------------------------------");
+        System.out.print("Enter Product (Bread): ");
         String pname = sc.nextLine(); 
 
         int pqty;
@@ -139,6 +139,7 @@ public class Inventory {
         System.out.println("Total number of products : " +totalProducts 
                          + "\nOverall total Quantity : " + totalqty);
         System.out.println("");
+        System.out.println("-------------------------------------------------------------------------------------------");
         
     } catch (Exception e) {
         System.out.println("Error retrieving total product count: " + e.getMessage());

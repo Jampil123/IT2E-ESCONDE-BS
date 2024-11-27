@@ -124,14 +124,14 @@ public class Sales {
     while (!validQuantity) {
         System.out.print("\nEnter quantity sold: ");
         
-        // Check if the quantity entered is a valid integer
+ 
         if (sc.hasNextInt()) {
             qty = sc.nextInt();
-            sc.nextLine(); // Clear the newline character
+            sc.nextLine(); 
 
             if (qty > 0) {
                 try {
-                    // Check stock availability
+                   
                     String sql = "SELECT p_qty FROM tbl_product WHERE p_id = ?";
                     PreparedStatement search = conf.connectDB().prepareStatement(sql);
                     search.setInt(1, pid);
@@ -142,7 +142,9 @@ public class Sales {
                         if (inventoryQTY >= qty) {
                             validQuantity = true; // Valid quantity entered
                         } else {
-                            System.out.println("Insufficient stock. Only " + inventoryQTY + " units available. Please try again.");
+                            System.out.println("Insufficient stock. Only " + inventoryQTY + " units available. ");
+                            
+                            return ;
                         }
                     }
                     result.close();

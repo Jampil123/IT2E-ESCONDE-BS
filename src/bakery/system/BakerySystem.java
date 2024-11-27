@@ -12,6 +12,7 @@ public class BakerySystem {
 
         do {
             // Main menu 
+            System.out.println("");
             System.out.println("+----------------------------------------------------------+");
             System.out.println("|               Bakery Management System                   |");
             System.out.println("+----------------------------------------------------------+");
@@ -24,6 +25,8 @@ public class BakerySystem {
             
             System.out.print("Enter Choice: ");
             choice = sc.nextLine();   
+            System.out.println("");
+            
             do {
                if (!choice.matches("[1-4]")) {
                    System.out.print("Invalid choice! Please select again : ");

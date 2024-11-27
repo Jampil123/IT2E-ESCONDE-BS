@@ -14,9 +14,8 @@ public class SpecificReport {
     public void specificReport() {
         
         do {
-            System.out.println("                     ----------------------------------------");
-            System.out.println("                     ====            Reports             ====");
-            System.out.println("                     ----------------------------------------");
+            System.out.println("===========================================================================================");
+            System.out.println("                                       Reports                                             ");
             
             Inventory in = new Inventory();
             in.viewInventory();
@@ -25,6 +24,7 @@ public class SpecificReport {
             System.out.println("1. View product by ID");
             System.out.println("2. View products by stock status (In Stock / Out of Stock)");
             System.out.println("3. Exit");
+            System.out.println("");
             
             System.out.println("----------------------------------------");
             System.out.print("Enter Choice: ");
@@ -57,12 +57,11 @@ public class SpecificReport {
    public void viewProductByProductID() {
     int pid = -1;
 
-    // Validate product ID input and check if it exists in tbl_product
     while (true) {
         System.out.print("Enter Product ID to view: ");
         if (sc.hasNextInt()) {
             pid = sc.nextInt();
-            sc.nextLine(); // Clear the newline character after integer input
+            sc.nextLine(); 
 
             try (PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_product WHERE p_id = ?")) {
                 search.setInt(1, pid);
@@ -72,7 +71,7 @@ public class SpecificReport {
                     System.out.println("Product with ID " + pid + " does not exist. Please try again.");
                 } else {
                     result.close();
-                    break; // Product ID exists; break out of loop
+                    break;
                 }
             } catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
@@ -93,8 +92,8 @@ public class SpecificReport {
             String pname = productResult.getString("p_name");
             double price = productResult.getDouble("p_price");
 
-            System.out.println("----------------------------------------");
-            System.out.println("| Product Details:                     |");
+            System.out.println("\n----------------------------------------");
+            System.out.println("| PRODUCT DETAILS:                     |");
             System.out.println("----------------------------------------");
             System.out.println("Product ID: " + pid);
             System.out.println("Product Name: " + pname);
@@ -114,7 +113,7 @@ public class SpecificReport {
         boolean hasSales = false;
         double totalRevenue = 0;
 
-        System.out.println("\nSales History:");
+        System.out.println("\nSALES HISTORY:");
         System.out.println("----------------------+----------------+---------------");
         System.out.println("|    Date of Sale     | Quantity Sold |    Revenue    |");
         System.out.println("----------------------+----------------+---------------");
