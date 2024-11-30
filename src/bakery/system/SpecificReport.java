@@ -14,21 +14,24 @@ public class SpecificReport {
     public void specificReport() {
         
         do {
-            System.out.println("===========================================================================================");
+            System.out.println("\n================================================================================================================================================================");
+            System.out.println("\n-------------------------------------------------------------------------------------------");
             System.out.println("                                       Reports                                             ");
             
             Inventory in = new Inventory();
             in.viewInventory();
             
-            System.out.println("\nOptions for Specific Report:");
-            System.out.println("1. View product by ID");
-            System.out.println("2. View products by stock status (In Stock / Out of Stock)");
-            System.out.println("3. Exit");
-            System.out.println("");
-            
-            System.out.println("----------------------------------------");
-            System.out.print("Enter Choice: ");
+            System.out.println("\n+-----------------------------------------------------------------------------------------+"
+                             + "\n| Options for Specific Report:                                                            |"
+                             + "\n+-----------------------------------------------------------------------------------------+"
+                             + "\n| 1.  | View product by ID                                                                |"
+                             + "\n| 2.  | View products by stock status (In Stock / Out of Stock)                           |"
+                             + "\n| 3.  | BACK to Main Menu                                                                 |"
+                             + "\n|-----------------------------------------------------------------------------------------|");
+         
+            System.out.print("| Enter Choice: ");
             choice = sc.nextLine();
+            System.out.println("+-----------------------------------------------------------------------------------------+");
             
             do {
                if (!choice.matches("[1-3]")) {
@@ -36,7 +39,6 @@ public class SpecificReport {
                    choice = sc.nextLine();
                }
             } while (!choice.matches("[1-3]"));
-            System.out.println("----------------------------------------");
             
              switch (choice) {
                 case "1":
@@ -58,7 +60,7 @@ public class SpecificReport {
     int pid = -1;
 
     while (true) {
-        System.out.print("Enter Product ID to view: ");
+        System.out.print("\nEnter Product ID to view: ");
         if (sc.hasNextInt()) {
             pid = sc.nextInt();
             sc.nextLine(); 
@@ -95,9 +97,9 @@ public class SpecificReport {
             System.out.println("\n----------------------------------------");
             System.out.println("| PRODUCT DETAILS:                     |");
             System.out.println("----------------------------------------");
-            System.out.println("Product ID: " + pid);
-            System.out.println("Product Name: " + pname);
-            System.out.println("Price: " + price);
+            System.out.println("| Product ID    : " + pid + "                  |");
+            System.out.println("| Product Name  : " + pname + "             |");
+            System.out.println("| Price         : " + price + "                  |");
             System.out.println("----------------------------------------");
         }
         productResult.close();
@@ -112,8 +114,9 @@ public class SpecificReport {
         int totalQtySold = 0;
         boolean hasSales = false;
         double totalRevenue = 0;
-
-        System.out.println("\nSALES HISTORY:");
+        
+        System.out.println("----------------------+----------------+---------------");
+        System.out.println("\n| SALES HISTORY:                                      |");
         System.out.println("----------------------+----------------+---------------");
         System.out.println("|    Date of Sale     | Quantity Sold |    Revenue    |");
         System.out.println("----------------------+----------------+---------------");
@@ -133,11 +136,10 @@ public class SpecificReport {
         if (!hasSales) {
             System.out.println("No sales record found for this product.");
         } else {
-            System.out.printf("Total Quantity Sold: %d\nTotal Revenue of the Product: %.2f\n", totalQtySold, totalRevenue);
+            System.out.printf("| Total Quantity Sold: %d\n| Total Revenue of the Product: %.2f\n", totalQtySold, totalRevenue);
         }
         System.out.println("-------------------------------------------------------");
-        System.out.println("");
-
+     
         salesResult.close();
         salesSearch.close();
 
@@ -150,13 +152,30 @@ public class SpecificReport {
         String sql = "SELECT p_id, p_name, p_qty, p_price, p_status FROM tbl_product WHERE p_status = ?";
         
         String status;
-        System.out.print("Enter stock status to filter by "
-                + "\n1.for In Stock "
-                + "\n2.for Sold Out\n ");
         
-        System.out.printf("\nEnter Choice: ");
-        int statusChoice = sc.nextInt();
-        sc.nextLine(); 
+        System.out.println("\nEnter stock status to filter by:");
+        System.out.println("1. In Stock");
+        System.out.println("2. Sold Out");
+
+        int statusChoice = 0;
+        boolean validInput = false;
+
+        // Validate input for status choice
+        while (!validInput) {
+            System.out.print("\nEnter Choice (1 or 2): ");
+            if (sc.hasNextInt()) {
+                statusChoice = sc.nextInt();
+                sc.nextLine(); // Consume the newline character
+                if (statusChoice == 1 || statusChoice == 2) {
+                    validInput = true; // Valid input
+                } else {
+                    System.out.println("Invalid choice! Please enter 1 for In Stock or 2 for Sold Out.");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a numeric value (1 or 2).");
+                sc.next(); // Clear invalid input
+            }
+        }
 
         status = (statusChoice == 1) ? "In Stock" : "Sold Out";
         
@@ -164,8 +183,8 @@ public class SpecificReport {
             search.setString(1, status);
             ResultSet result = search.executeQuery();
 
-            System.out.println("--------------------------------");
-            System.out.println("\nProducts with status \"" + status + "\":");
+            System.out.println("+-----------------------------------------------------------------------------------------+");
+            System.out.println("\nProducts with status \"" + status + "\" :");
             System.out.println("-----------------------------------------------------------------");
             System.out.printf("| %-13s | %-13s | %-13s | %-13s |\n",
                         "Product ID", "Product Name", "Quantity", "Price");
@@ -186,9 +205,9 @@ public class SpecificReport {
                 num_p++;
             }
             System.out.println("-----------------------------------------------------------------");
-            System.out.println("Number of Products " + status + " : " + num_p);
-            System.out.println("");
-
+            System.out.println("| Number of Products " + status + " : " + num_p );
+            System.out.println("-----------------------------------------------------------------");
+             
             if (!hasResults) {
                 System.out.println("No products found with status \"" + status + "\".");
             }

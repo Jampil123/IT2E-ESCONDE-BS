@@ -12,36 +12,33 @@ public class Inventory {
     public void inventoryCRUD(){
         String choice;
         do {
-            System.out.println("--------------------------------");
-            System.out.println("====  Inventory Management  ====");
-            System.out.println("--------------------------------");
-            
-            System.out.println("1. ADD Product");
-            System.out.println("2. VIEW Products");
-            System.out.println("3. UPDATE Product");
-            System.out.println("4. DELETE Product");
-            System.out.println("5. BACK to Main Menu");
-            System.out.print("--------------------------------");
-            System.out.print("\nEnter Action: ");
-            
+            System.out.println("\n================================================================================================================================================================");
+            System.out.println("\n+----------------------------------------------------------+"
+                             + "\n|                 INVENTORY MANAGEMENT                     |"
+                             + "\n+----------------------------------------------------------+"
+                             + "\n| 1.  | Add Product                                        |"
+                             + "\n| 2.  | View Product                                       |"
+                             + "\n| 3.  | Update Product                                     |"
+                             + "\n| 4.  | Delete Product                                     |"
+                             + "\n| 5.  | BACK to Main Menu                                  |"
+                             + "\n|----------------------------------------------------------|");
+            System.out.print("| Enter Action: ");
             choice = sc.nextLine();
-            
+            System.out.println("+----------------------------------------------------------+");
+
             do {
                if (!choice.matches("[1-5]")) {
-                   System.out.print("Invalid choice!!!"
-                           + "\nPlease select again : ");
+                   System.out.print("Invalid choice! Please select again : ");
                    choice = sc.nextLine();
                }
             } while (!choice.matches("[1-5]"));
-            System.out.print("--------------------------------\n");
-            System.out.println("");
+           
             switch (choice) {
                 case "1":
                     addProduct();
                     break;
 
                 case "2":
-                    System.out.println("Bakery Inventory Report: ");
                     viewInventory();
                     break;
 
@@ -57,7 +54,7 @@ public class Inventory {
                     break;
 
                 case "5":
-                    System.out.println("Returning to Main Menu...");
+                    System.out.println("Returning to Main Menu...\n");
                     break;
 
                 default:
@@ -68,8 +65,10 @@ public class Inventory {
     }
     
     public void addProduct() {
-        System.out.println("                   Enter Product Details                    ");
-        System.out.println("------------------------------------------------------------");
+        System.out.println("\n------------------------------------------------------------"
+                         + "\n| Enter Product Details:                                   |"
+                         + "\n------------------------------------------------------------");
+        
         System.out.print("Enter Product (Bread): ");
         String pname = sc.nextLine(); 
 
@@ -82,8 +81,7 @@ public class Inventory {
                 sc.nextLine(); 
                 break;
             } else {
-                System.out.print("Invalid input!!!"
-                        + "\nPlease try Again : ");
+                System.out.print("Invalid input! Please try Again : ");
                 sc.next(); 
             }
         }
@@ -97,8 +95,7 @@ public class Inventory {
                 sc.nextLine(); 
                 break;
             } else {
-                System.out.print("Invalid input!!!"
-                        + "\nPlease try Again : ");
+                System.out.print("Invalid input! Please try Again : ");
                 sc.next(); 
             }
         }
@@ -107,12 +104,12 @@ public class Inventory {
     String sql = "INSERT INTO tbl_product (p_name, p_qty, p_price, p_status) VALUES (?, ?, ?, ?)";
 
     conf.addRecord(sql, pname, pqty, pprice, pstatus);
-    System.out.println("Product added successfully!");
+    System.out.println("Product added successfully!!!");
 }
 
     public void viewInventory() {
         
-        System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.println("\n-------------------------------------------------------------------------------------------");
         System.out.println("|                                     INVENTORY                                           |");
         
         String sqlQuery = "SELECT p_id, p_name, p_qty, p_price, p_status FROM tbl_product";
@@ -134,12 +131,11 @@ public class Inventory {
                 totalProducts++;
                 totalqty++; 
             }
-        System.out.println("   Product Inventory Overview   ");
-        System.out.println("--------------------------------");
-        System.out.println("Total number of products : " +totalProducts 
-                         + "\nOverall total Quantity : " + totalqty);
-        System.out.println("");
-        System.out.println("-------------------------------------------------------------------------------------------");
+        System.out.println("|   Product Inventory Overview                                                            |"
+                         + "\n|---------------------------------------                                                  |"
+                         + "\n| Total number of products : " +totalProducts+ "                                                           |"
+                         + "\n| Overall total Quantity : " +totalqty+ "                                                            |");
+        System.out.println("===========================================================================================");
         
     } catch (Exception e) {
         System.out.println("Error retrieving total product count: " + e.getMessage());
@@ -151,7 +147,7 @@ public class Inventory {
         int productId;
     
         while (true) {
-            System.out.print("Enter Product ID to update: ");
+            System.out.print("\nEnter Product ID to update: ");
             if (sc.hasNextInt()) {
                 productId = sc.nextInt();
                 sc.nextLine(); // clear newline
@@ -204,13 +200,13 @@ public class Inventory {
         String sqlUpdate = "UPDATE tbl_product SET p_name = ?, p_qty = ?, p_price = ?, p_status = ? WHERE p_id = ?";
         
         conf.updateRecord(sqlUpdate, newName, newQty, newPrice, newStatus, productId); 
-        System.out.println("Product Updated successfully!");
+        System.out.println("Product Updated successfully!!!");
         
     }
      
     public void deleteProduct() {
         int productId;
-        System.out.print("Enter Product ID to Delete: ");
+        System.out.print("\nEnter Product ID to Delete: ");
 
         while (true) {
             
@@ -222,19 +218,18 @@ public class Inventory {
                 if (conf.getSingleValue(sql, productId) != 0) {
                     break; 
                 } else {
-                    System.out.print("Product with ID " + productId + " does not exist. "
-                            + "\nPlease try again: ");
+                    System.out.print("Product with ID " + productId + " does not exist!"
+                            + " Please try again : ");
                 }
             } else {
-                System.out.print("Invalid input. Please enter a numeric Product ID."
-                        + "\nPlease try again: ");
+                System.out.print("Invalid input! Please enter a numeric Product ID :");
                 sc.next(); 
             }
         }
         System.out.println("");
         String qry = "DELETE FROM tbl_product WHERE p_id = ?";
         conf.deleteRecord(qry, productId);
-        System.out.println("Product Deleted successfully!");
+        System.out.println("Product Deleted successfully!!!");
     }
 }
 

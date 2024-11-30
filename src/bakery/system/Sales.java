@@ -18,30 +18,27 @@ public class Sales {
         String choice;
         
         do {
-            System.out.println("--------------------------------");
-            System.out.println("======= Sales Management =======");
-            System.out.println("--------------------------------");
-            
-            System.out.println("1. ADD Sales Record");
-            System.out.println("2. VIEW Sales Records");
-            System.out.println("3. UPDATE Sales Record");
-            System.out.println("4. DELETE Sales Record");
-            System.out.println("5. BACK to Main Menu");
-            
-            
-            System.out.println("---------------------------------");   
-            System.out.print("Enter Action: ");
+            System.out.println("\n================================================================================================================================================================");
+            System.out.println("\n+----------------------------------------------------------+"
+                             + "\n|                 SALES MANAGEMENT                         |"
+                             + "\n+----------------------------------------------------------+"
+                             + "\n| 1.  | Add Sales                                          |"
+                             + "\n| 2.  | View Sales                                         |"
+                             + "\n| 3.  | Update Sales                                       |"
+                             + "\n| 4.  | Delete Sales                                       |"
+                             + "\n| 5.  | BACK to Main Menu                                  |"
+                             + "\n|----------------------------------------------------------|");
+            System.out.print("| Enter Action: ");
             choice = sc.nextLine();
+            System.out.println("+----------------------------------------------------------+");
             
             do {
                if (!choice.matches("[1-5]")) {
-                   System.out.print("Invalid choice!!!"
-                           + "\nPlease select again : ");
+                   System.out.print("Invalid choice! Please select again : ");
                    choice = sc.nextLine();
                }
             } while (!choice.matches("[1-5]"));
-            System.out.println("---------------------------------"); 
-            
+          
             switch (choice) {
                 case "1":
                     addSales();
@@ -63,7 +60,7 @@ public class Sales {
                 break;
 
                 case "5":
-                    System.out.println("Returning to Main Menu...");
+                    System.out.println("Returning to Main Menu...\n");
                     break;
             }
 
@@ -71,14 +68,14 @@ public class Sales {
     }
     private void addSales(){
         
-    System.out.println("Product list: ");
+    System.out.println("\nProduct list: ");
     Inventory in = new Inventory();
     in.viewInventory();
 
     int pid = 0;
     boolean validProductId = false;
 
-    System.out.print("Enter product ID: ");
+    System.out.print("\nEnter product ID: ");
     while (!validProductId) {
         
         if (sc.hasNextInt()) {
@@ -98,22 +95,20 @@ public class Sales {
                     double price = result.getDouble("p_price");
                     int inventoryQTY = result.getInt("p_qty");
 
-                    System.out.println("\n---------------------------------");
-                    System.out.println("Selected product: " + pname
-                            + "\nPrice: " + price
-                            + "\nQuantity: " + inventoryQTY);
-                    System.out.println("---------------------------------");
+                    System.out.println("---------------------------------------"
+                                     + "\n| Selected product     : " + pname  
+                                     + "\n| Price                : " + price  
+                                     + "\n| Quantity             : " + inventoryQTY );
+                    System.out.println("---------------------------------------");
                 } else {
-                    System.out.print("Product with ID " + pid + " does not exist."
-                            + "\nPlease try again: ");
+                    System.out.print("Product with ID " + pid + " does not exist! Please try again: ");
                 }
                 result.close();
             } catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         } else {
-            System.out.print("Invalid input!!!"
-                    + "Please try again: ");
+            System.out.print("Invalid input! Please try again: ");
             sc.next(); 
         }
     }
@@ -194,11 +189,11 @@ public class Sales {
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
-            System.out.println("Sales Added successfully");
+            System.out.println("Sales Added successfully!!!");
     }
 
     private void viewSales(){
-        System.out.println("Sales Table: ");
+        System.out.println("\nSales Table: ");
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
         System.out.println("|                                                            SALES                                                            |");
         
@@ -240,16 +235,15 @@ public class Sales {
                 averageRevenue = totalRevenue / totalSales;
             }
 
-            System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
-            System.out.println("SALES SUMMARY");
-            System.out.println("--------------------------------");
-            System.out.println("Total Sales Transactions: " + totalSales);
-            System.out.println("Total Quantity Sold: " + totalQuantitySold);
-            System.out.println("Average Sales Revenue: " + String.format("%.2f", averageRevenue));
-            System.out.println("Most Sold Product: " + mostSoldProduct + " (" + mostSoldQuantity + " units sold)");
-            System.out.println("Total Revenue: " + String.format("%.2f", totalRevenue));
-            System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
-
+            System.out.println("| SALES SUMMARY                                                                                                               |"
+                       + "\n|-----------------------------------------------------------------------------------------------------------------------------|"
+                    + "\n| Total Sales Transactions       : " + totalSales + "                                                                                         |"
+                    + "\n| Total Quantity Sold            : " + totalQuantitySold + "                                                                                        |"
+                    + "\n| Average Sales Revenue          : " + String.format("%.2f", averageRevenue) + "                                                                                     |"
+                    + "\n| Most Sold Product              : " + mostSoldQuantity + " units sold)" + "                                                                            |"
+                    + "\n| Total Revenue                  : " + String.format("%.2f", totalRevenue) + "                                                                                    |"
+                    + "\n-------------------------------------------------------------------------------------------------------------------------------");
+            
             getRow.close();
         } catch(SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -257,110 +251,120 @@ public class Sales {
     }
     
     private void updateSales() {
-   
-        int salesId = -1;
-        
-        while (true) {
-            System.out.print("Enter Sales ID to update: ");
-            if (sc.hasNextInt()) {
-                salesId = sc.nextInt();
-                sc.nextLine();
-                try (PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_sales WHERE sale_id = ?")) {
-                    search.setInt(1, salesId);
-                    ResultSet result = search.executeQuery();
+       System.out.println("\nAdministrator authorization is required to update sales.");
+       System.out.print("\nEnter administrator password: ");
+       String adminPassword = sc.nextLine();
 
-                    if (!result.next()) {
-                        System.out.println("Sale with ID " + salesId + " does not exist.");
-                        return;
-                    }
-                    // If sale ID exists, break out of loop
-                    result.close();
-                    break;
-                } catch (SQLException e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            } else {
-                System.out.println("Invalid input. Please enter a valid numeric Sales ID.");
-                sc.next(); // Consume the invalid input
-            }
-        }
-    
-        try (PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_sales WHERE sale_id = ?")) {
-            search.setInt(1, salesId);
-            ResultSet result = search.executeQuery();
+       // Replace "admin123" with your actual admin password logic
+       if (!adminPassword.equals("admin123")) {
+           System.out.println("Authorization failed! Contact the administrator.");
+           return;
+       }
 
-            if (result.next()) {
-                String currentProduct = result.getString("p_name");
-                int currentQty = result.getInt("qty_sold");
-                double currentPrice = result.getDouble("s_price");
-                double currentRevenue = result.getDouble("t_revenue");
+       int salesId = -1;
+       while (true) {
+           System.out.print("Enter Sales ID to update: ");
+           if (sc.hasNextInt()) {
+               salesId = sc.nextInt();
+               sc.nextLine();
+               try (PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_sales WHERE sale_id = ?")) {
+                   search.setInt(1, salesId);
+                   ResultSet result = search.executeQuery();
 
-                System.out.println("--------------------------------");
-                System.out.println("Current Sale Record: " + currentProduct 
-                        + "\nQuantity Sold: " + currentQty  
-                        + "\nPrice: " + currentPrice);
-                System.out.println("--------------------------------");
-          
-                int newQty = -1;
-                while (true) {
-                    System.out.print("Enter new quantity sold: ");
-                    if (sc.hasNextInt()) {
-                        newQty = sc.nextInt();
-                        sc.nextLine(); // Clear newline
+                   if (!result.next()) {
+                       System.out.println("Sale with ID " + salesId + " does not exist.");
+                       return;
+                   }
+                   result.close();
+                   break;
+               } catch (SQLException e) {
+                   System.out.println("Error: " + e.getMessage());
+               }
+           } else {
+               System.out.println("Invalid input. Please enter a valid numeric Sales ID.");
+               sc.next();
+           }
+       }
 
-                        // Check if the new quantity is positive and within reasonable range
-                        if (newQty <= 0) {
-                            System.out.println("Quantity must be positive. Please enter a valid number.");
-                        } else {
-                            // Calculate the new revenue based on new quantity
-                            double newRevenue = newQty * currentPrice;
+       try (PreparedStatement search = conf.connectDB().prepareStatement("SELECT * FROM tbl_sales WHERE sale_id = ?")) {
+           search.setInt(1, salesId);
+           ResultSet result = search.executeQuery();
 
-                            // Update the sales record with the new quantity and revenue
-                            sql = "UPDATE tbl_sales SET qty_sold = ?, t_revenue = ? WHERE sale_id = ?";
-                            conf.updateRecord(sql, newQty, newRevenue, salesId);
+           if (result.next()) {
+               String currentProduct = result.getString("p_name");
+               int currentQty = result.getInt("qty_sold");
+               double currentPrice = result.getDouble("s_price");
 
-                            break; // Exit the loop once updated
-                        }
-                    } else {
-                        System.out.println("Invalid input. Please enter a valid numeric quantity.");
-                        sc.next();
-                    }
-                }
-            }
-            System.out.println("");
-        } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-        System.out.println("Sales Updated successfully");
-    }
-    
+               System.out.println("--------------------------------");
+               System.out.println("Current Sale Record: " + currentProduct 
+                       + "\nQuantity Sold: " + currentQty  
+                       + "\nPrice: " + currentPrice);
+               System.out.println("--------------------------------");
+
+               int newQty = -1;
+               while (true) {
+                   System.out.print("Enter new quantity sold: ");
+                   if (sc.hasNextInt()) {
+                       newQty = sc.nextInt();
+                       sc.nextLine(); // Clear newline
+
+                       if (newQty <= 0) {
+                           System.out.println("Quantity must be positive. Please enter a valid number.");
+                       } else {
+                           double newRevenue = newQty * currentPrice;
+                           sql = "UPDATE tbl_sales SET qty_sold = ?, t_revenue = ? WHERE sale_id = ?";
+                           conf.updateRecord(sql, newQty, newRevenue, salesId);
+                           break;
+                       }
+                   } else {
+                       System.out.println("Invalid input. Please enter a valid numeric quantity.");
+                       sc.next();
+                   }
+               }
+           }
+           System.out.println("");
+       } catch (SQLException e) {
+           System.out.println("Error: " + e.getMessage());
+       }
+       System.out.println("Sales Updated successfully!!!");
+   }
+
+
     public void deleteProduct() {
-        int productId;
-        System.out.print("Enter Product ID to Delete: ");
+       System.out.println("\nAdministrator authorization is required to delete sales.");
+       System.out.print("\nEnter administrator password: ");
+       String adminPassword = sc.nextLine();
 
-        while (true) {
-            
-            if (sc.hasNextInt()) {
-                productId = sc.nextInt();
-                sc.nextLine(); 
+       // Replace "admin123" with your actual admin password logic
+       if (!adminPassword.equals("admin123")) {
+           System.out.println("Authorization failed! Contact the administrator.");
+           return;
+       }
 
-                String sql = "SELECT sale_id FROM tbl_sales WHERE sale_id = ?";
-                if (conf.getSingleValue(sql, productId) != 0) {
-                    break; 
-                } else {
-                    System.out.print("Product with ID " + productId + " does not exist. "
-                            + "\nPlease try again: ");
-                }
-            } else {
-                System.out.print("Invalid input. Please enter a numeric Product ID."
-                        + "\nPlease try again: ");
-                sc.next(); 
-            }
-        }
-        String qry = "DELETE FROM tbl_sales WHERE sale_id = ?";
-        conf.deleteRecord(qry, productId);
-        System.out.println("Product Deleted successfully!");
-    }
+       int productId;
+       System.out.print("Enter Product ID to Delete: ");
+       while (true) {
+           if (sc.hasNextInt()) {
+               productId = sc.nextInt();
+               sc.nextLine(); 
+
+               String sql = "SELECT sale_id FROM tbl_sales WHERE sale_id = ?";
+               if (conf.getSingleValue(sql, productId) != 0) {
+                   break; 
+               } else {
+                   System.out.print("Product with ID " + productId + " does not exist. "
+                           + "\nPlease try again: ");
+               }
+           } else {
+               System.out.print("Invalid input. Please enter a numeric Product ID."
+                       + "\nPlease try again: ");
+               sc.next(); 
+           }
+       }
+       String qry = "DELETE FROM tbl_sales WHERE sale_id = ?";
+       conf.deleteRecord(qry, productId);
+       System.out.println("Product Deleted successfully!!!");
+   }
 
 }
 

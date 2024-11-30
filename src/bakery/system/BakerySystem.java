@@ -11,22 +11,20 @@ public class BakerySystem {
         String choice;
 
         do {
-            // Main menu 
-            System.out.println("");
-            System.out.println("+----------------------------------------------------------+");
-            System.out.println("|               Bakery Management System                   |");
-            System.out.println("+----------------------------------------------------------+");
-            
-            System.out.println("1. Inventory");
-            System.out.println("2. Sales");
-            System.out.println("3. Report");
-            System.out.println("4. Exit");
-            System.out.println("");
-            
-            System.out.print("Enter Choice: ");
+            // Main menu
+            System.out.println("================================================================================================================================================================");
+            System.out.println("\n+----------------------------------------------------------+"
+                             + "\n|               Bakery Management System                   |"
+                             + "\n+----------------------------------------------------------+"
+                             + "\n| 1.   |   Inventory                                       |"
+                             + "\n| 2.   |   Sales                                           |"
+                             + "\n| 3.   |   Report                                          |"
+                             + "\n| 4.   |   Exit                                            |"
+                             + "\n|----------------------------------------------------------|");
+            System.out.print("| Enter Action: ");
             choice = sc.nextLine();   
-            System.out.println("");
-            
+            System.out.println("+----------------------------------------------------------+");
+           
             do {
                if (!choice.matches("[1-4]")) {
                    System.out.print("Invalid choice! Please select again : ");
